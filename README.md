@@ -39,11 +39,13 @@ El nombre y el idioma se guardan en `localStorage`. Las partidas incompletas se 
 
 «Jugar nuevamente» borra el final y reinicia la partida, conservando tu nombre y el idioma. No hay backend, cuentas, base de datos ni servicios externos. Los datos se mantienen en el navegador de cada persona y son independientes para cada dominio.
 
-## Ejecutar en tu equipo
+## Instalación local
 
 Requiere Node.js 24 y npm. También son compatibles Node.js 22.12 o posterior de la rama 22 y Node.js 26.
 
 ```bash
+git clone https://github.com/vx66/hit-pchan.git
+cd hit-pchan
 npm ci
 npm run dev
 ```
@@ -67,7 +69,7 @@ npm run build
 npm run preview
 ```
 
-La compilación se genera en `dist/`. `preview` sirve para revisar esa compilación en tu equipo; en el VPS, Nginx sirve los archivos estáticos.
+La compilación se genera en `dist/` y puede servirse con un servidor de archivos estáticos. `preview` permite revisarla localmente.
 
 Las pruebas de navegador requieren instalar los navegadores de Playwright:
 
@@ -78,34 +80,11 @@ npm run test:browser
 
 En Linux, Playwright puede indicar que faltan bibliotecas del sistema. Las pruebas cubren ratón, interacción táctil, umbrales, diálogos, recarga, final, ciclo de frases y diseño sin superposiciones en móviles, tablets y escritorio. Son pruebas con dispositivos simulados.
 
-## Desplegar con Dokploy
+## Ejecutar con Docker
 
-El repositorio incluye un `Dockerfile` de dos etapas: Node.js instala las dependencias con el archivo de bloqueo, ejecuta las pruebas unitarias y compila; Nginx sirve únicamente el resultado de `dist/` en el puerto **80**. El contenedor incluye una comprobación de salud en `/healthz`.
+Con Docker instalado, puedes construir y ejecutar el juego sin instalar Node.js en tu equipo. Ejecuta los siguientes comandos desde la carpeta del repositorio clonado.
 
-No necesitas variables de entorno, volúmenes ni una base de datos.
-
-1. Sube los archivos a tu repositorio `vx66/hit-pchan` siguiendo los comandos de la siguiente sección.
-2. En Dokploy, crea un proyecto y una aplicación.
-3. Conecta GitHub y selecciona el repositorio `vx66/hit-pchan`, rama `main`. Si es privado, concede acceso a ese repositorio al proveedor de GitHub de Dokploy.
-4. Configura el tipo de construcción como **Dockerfile**:
-
-   | Campo | Valor |
-   | --- | --- |
-   | Dockerfile Path | `Dockerfile` |
-   | Docker Context Path | `.` |
-   | Docker Build Stage | `production` |
-
-5. En **Domains**, agrega el dominio que usarás, ruta `/` y puerto del contenedor **80**. Para un dominio propio, apunta su DNS al VPS y configura HTTPS desde Dokploy.
-6. Pulsa **Deploy** y comprueba que la construcción y el contenedor estén correctos.
-7. Abre tu dominio. La dirección `https://TU_DOMINIO/healthz` debe devolver `ok`.
-
-Los nombres de los campos pueden variar ligeramente según la versión de Dokploy. Consulta su [documentación de Dockerfile](https://docs.dokploy.com/docs/core/applications/build-type#dockerfile) y de [dominios](https://docs.dokploy.com/docs/core/domains).
-
-La aplicación está preparada para publicarse en la raíz del dominio. El puerto 80 es el puerto interno del contenedor; Dokploy gestiona el acceso público y HTTPS.
-
-### Comprobar la imagen Docker en tu equipo
-
-Si tienes Docker instalado:
+El `Dockerfile` instala las dependencias, ejecuta las pruebas unitarias y compila en una primera etapa. La imagen final utiliza Nginx para servir la aplicación en el puerto interno **80**, con una comprobación de salud en `/healthz`. No necesita variables de entorno, volúmenes ni una base de datos.
 
 ```bash
 docker build -t hit-pchan:local .
@@ -119,31 +98,6 @@ curl --fail http://127.0.0.1:8080/healthz
 ```
 
 Detén el contenedor con `Ctrl+C` en la terminal donde lo ejecutaste.
-
-## Subir a GitHub
-
-Para un repositorio remoto vacío y una carpeta local que todavía no está inicializada con Git:
-
-```bash
-cd ~/Projects/PChanClicker
-git init -b main
-git add .
-git commit -m "Preparar Hit P-Chan para Dokploy"
-git remote add origin https://github.com/vx66/hit-pchan.git
-git push -u origin main
-```
-
-Si Git te solicita nombre y correo, configura tu identidad antes de repetir el commit. Si ya inicializaste Git o configuraste `origin`, conserva esa configuración y omite los pasos que ya hiciste. Si el repositorio remoto contiene archivos, integra primero sus cambios; no es necesario forzar la subida.
-
-Para futuras actualizaciones:
-
-```bash
-git add .
-git commit -m "Actualizar Hit P-Chan"
-git push
-```
-
-Después, ejecuta **Deploy** en Dokploy. También puedes configurar el despliegue automático desde su integración con GitHub.
 
 ## Estructura
 
