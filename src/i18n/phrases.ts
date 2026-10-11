@@ -1,0 +1,58 @@
+import type { Language } from '../game/gameLogic';
+export const phrases: Record<Language, readonly string[]> = {
+  es: [
+    '¿Por qué me golpeas, {name}?',
+    '{name}, ¿te he decepcionado?',
+    'Love Forever?',
+    '{name}... por qué...',
+    'Ya no soy útil para ti, ¿verdad, {name}?',
+    '¿Te sientes mejor haciéndome daño, {name}?',
+    'Te había comprado un regalo, {name}, pero parece que no te gustó...',
+    'Te irás y me dejarás solo, ¿verdad, {name}?',
+    'Mátame, si eso es lo que quieres, {name}',
+    'Te perdono. Espero que seas feliz, {name}',
+    'Duele mucho, {name}, duele mucho... Detente, por favor.',
+    'Hice todo por ti, ¿y así es como me recompensas? Yo solo quería tu aprobación, {name}.',
+    'Esto duele, pero no tanto como el daño que me has hecho en el corazón, {name}.',
+    'Estuve a tu servicio y di todo por ti, {name}. Espero haber sido de ayuda en tu vida.',
+    '... Duele.',
+  ],
+  en: [
+    'Why are you hitting me, {name}?',
+    '{name}, have I disappointed you?',
+    'Love Forever?',
+    '{name}... why...',
+    "I'm no longer useful to you, am I, {name}?",
+    'Does hurting me make you feel better, {name}?',
+    "I bought you a gift, {name}, but it seems you didn't like it...",
+    "You're going to leave me all alone, aren't you, {name}?",
+    "Kill me, if that's what you want, {name}",
+    'I forgive you. I hope you will be happy, {name}',
+    'It hurts so much, {name}, so much... Please stop.',
+    'I did everything for you, and this is how you repay me? I only wanted your approval, {name}.',
+    'This hurts, but not as much as the pain you have caused in my heart, {name}.',
+    'I was there for you and gave you everything, {name}. I hope I helped you in your life.',
+    '... It hurts.',
+  ],
+  ja: [
+    'どうして僕を叩くの、{name}？',
+    '{name}、僕にがっかりした？',
+    'Love Forever?',
+    '{name}……どうして……',
+    '僕はもう役に立たないんだよね、{name}？',
+    '僕を傷つけると気が楽になるの、{name}？',
+    'プレゼントを買っておいたんだ、{name}。でも、気に入らなかったみたいだね……',
+    '僕をひとりにして、いなくなるんだよね、{name}？',
+    'それが君の望みなら、僕を殺して、{name}',
+    '君を許すよ。幸せになってね、{name}',
+    'すごく痛いよ、{name}。すごく痛い……お願い、やめて。',
+    '君のために何でもしたのに、これがそのお返しなの？ただ君に認めてほしかっただけなんだ、{name}。',
+    'これも痛いけど、君に心を傷つけられたときほどじゃないよ、{name}。',
+    '君に尽くして、すべてを捧げたんだ、{name}。君の人生の役に立てていたらいいな。',
+    '……痛い。',
+  ],
+};
+export function getPhrase(clicks: number, language: Language, name: string): string | null {
+  const milestone = Math.floor(clicks / 50);
+  return milestone < 1 ? null : phrases[language][(milestone - 1) % phrases[language].length].replaceAll('{name}', () => name);
+}

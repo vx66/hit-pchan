@@ -1,0 +1,6 @@
+import type { Translation } from '../i18n/es';
+import { SpeechBubble } from './SpeechBubble';
+import { PChan, type Impact } from './PChan';
+export function GameScreen({ t, phase, weaponPhase, clicks, speech, impact, disabled, onHit }: { t: Translation; phase: 1 | 2 | 3; weaponPhase: 1 | 2 | 3; clicks: number; speech: string | null; impact: Impact | null; disabled: boolean; onHit: (x: number, y: number, touch: boolean) => void }) {
+  return <main className="scene game-screen"><h1>{t.title}</h1><div className="pchan-with-speech">{speech && !disabled && <SpeechBubble key={Math.floor(clicks / 50)} text={speech} />}<PChan phase={phase} weaponPhase={weaponPhase} impact={impact} label={t.hit} disabled={disabled} onHit={onHit} /></div><div className="hit-counter"><span aria-hidden="true">♥</span><span>{(weaponPhase === 3 ? t.stabCount : t.hitCount).replace('{count}', String(clicks))}</span><span aria-hidden="true">♥</span></div>{impact && <div key={impact.id} className={`particles particles-${weaponPhase}`} style={{ left: impact.x, top: impact.y }} aria-hidden="true">{Array.from({ length: 6 }, (_, i) => <span key={i} style={{ '--angle': `${i * 60}deg`, '--distance': `${35 + i % 3 * 14}px`, '--spin': `${i * 35}deg` } as React.CSSProperties}>{i % 2 ? '✦' : '♥'}</span>)}</div>}</main>;
+}
