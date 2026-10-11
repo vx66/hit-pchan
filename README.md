@@ -82,27 +82,35 @@ En Linux, Playwright puede indicar que faltan bibliotecas del sistema. Las prueb
 
 ## Ejecutar con Docker
 
-Con Docker instalado, puedes construir y ejecutar el juego sin instalar Node.js en tu equipo. Ejecuta los siguientes comandos desde la carpeta del repositorio clonado.
-
-El `Dockerfile` instala las dependencias, ejecuta las pruebas unitarias y compila en una primera etapa. La imagen final utiliza Nginx para servir la aplicación en el puerto interno **80**, con una comprobación de salud en `/healthz`. No necesita variables de entorno, volúmenes ni una base de datos.
+Con Docker y Docker Compose instalados, puedes ejecutar el juego sin instalar Node.js en tu equipo. Desde la carpeta del repositorio clonado:
 
 ```bash
-docker build -t hit-pchan:local .
-docker run --rm --name hit-pchan-local -p 127.0.0.1:8080:80 hit-pchan:local
+docker compose -f docker-compose.yml -f docker-compose.local.yml up -d --build
 ```
 
-Abre `http://127.0.0.1:8080`. En otra terminal puedes comprobar su salud:
+Abre `http://127.0.0.1:8080`. Para comprobar la salud y consultar los registros:
 
 ```bash
 curl --fail http://127.0.0.1:8080/healthz
+docker compose -f docker-compose.yml -f docker-compose.local.yml logs -f
 ```
 
-Detén el contenedor con `Ctrl+C` en la terminal donde lo ejecutaste.
+Para detenerlo:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.local.yml down
+```
+
+El `Dockerfile` instala las dependencias, ejecuta las pruebas unitarias y compila en una primera etapa. La imagen final utiliza Nginx para servir el juego en el puerto interno **80**, con una comprobación de salud en `/healthz`. No necesita variables de entorno, volúmenes ni una base de datos.
+
+`docker-compose.yml` define el servicio `hit-pchan` para plataformas que gestionan el dominio y el acceso al contenedor. `docker-compose.local.yml` añade únicamente el acceso local en el puerto 8080. El archivo principal utiliza construcción desde el código fuente y requiere Docker Compose; para Docker Stack sería necesario publicar primero una imagen.
 
 ## Estructura
 
 ```text
 ├── Dockerfile                 # Construcción y servidor de producción
+├── docker-compose.yml         # Servicio para despliegue
+├── docker-compose.local.yml   # Puerto para uso local
 ├── .dockerignore              # Exclusiones para la imagen
 ├── deploy/nginx.conf          # Recursos estáticos, caché y salud
 ├── public/                    # Favicon y sprites que sirve la aplicación

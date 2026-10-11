@@ -1,0 +1,11 @@
+services:
+  hit-pchan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    restart: unless-stopped
+    expose:
+      - "80"
+    # El Dockerfile incluye la comprobación de salud en /healthz.
+    # Dokploy configura el dominio y la red desde su panel.
