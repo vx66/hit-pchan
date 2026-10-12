@@ -25,3 +25,17 @@ export async function seed(page: Page, clicks: number, extra: Record<string, unk
   await advance(page,clicks);
   if(clicks<1500 && clicks!==500 && clicks!==1000) await expect(page.locator('.pchan')).toHaveAttribute('aria-disabled','false');
 }
+
+export async function finishEnding(page: Page) {
+  await page.clock.runFor(2100);
+  await expect(page.locator('.ending-screen')).toHaveAttribute('data-stage','message');
+  const text=await page.locator('.ending-message-scroll p').getAttribute('aria-label');
+  await page.clock.runFor((text?.length ?? 0)*35+100);
+  await page.getByRole('button',{name:'Continuar',exact:true}).click();
+  await page.clock.runFor(3100);
+  await expect(page.locator('.ending-screen')).toHaveAttribute('data-stage','scare');
+  await page.clock.runFor(5100);
+  await expect(page.locator('.ending-screen')).toHaveAttribute('data-stage','outro');
+  await page.clock.runFor(1100);
+  await expect(page.getByRole('button',{name:'Jugar nuevamente'})).toBeVisible();
+}

@@ -1,18 +1,18 @@
 import { test, expect } from '@playwright/test';
-import { seed } from './helpers';
+import { seed, finishEnding } from './helpers';
 const sizes = [[320,568],[390,844],[768,1024],[1024,768],[844,390],[1280,800]] as const;
 for (const [width,height] of sizes) {
   for (const screen of ['start','speech','dialog','ending'] as const) {
     test(`${width}x${height} ${screen} fits without overlapping controls`, async ({page}) => {
-      await page.setViewportSize({width,height}); await page.emulateMedia({reducedMotion:'reduce'});
+      await page.setViewportSize({width,height}); if(screen==='ending') await page.clock.install(); await page.emulateMedia({reducedMotion:'reduce'});
       if (screen === 'start') await page.goto('/');
       else await seed(page,screen==='speech'?700:screen==='dialog'?500:1500,{playerName:'abcdefghijklmnopqrstuvwx'});
       if (screen==='start') await expect(page.getByLabel('Tu nombre')).toBeVisible();
       if (screen==='speech') await expect(page.locator('.speech-bubble')).toBeVisible();
       if (screen==='dialog') await expect(page.getByRole('dialog')).toBeVisible();
-      if (screen==='ending') await expect(page.getByRole('button',{name:'Jugar nuevamente'})).toBeVisible();
+      if (screen==='ending') await finishEnding(page);
       await page.evaluate(() => document.fonts.ready);
-      const selectors = screen==='start' ? ['h1','.start-form','.character-stage','.language-selector','.creator-credit'] : screen==='speech' ? ['h1','.speech-bubble','.character-stage','.hit-counter','.language-selector','.creator-credit'] : screen==='dialog' ? ['.unlock-dialog'] : ['.ending-screen p','.replay-button','.creator-credit'];
+      const selectors = screen==='start' ? ['h1','.start-form','.character-stage','.language-selector','.creator-credit'] : screen==='speech' ? ['h1','.speech-bubble','.character-stage','.hit-counter','.language-selector','.creator-credit'] : screen==='dialog' ? ['.unlock-dialog'] : ['.replay-button','.creator-credit'];
       const rectangles = await page.evaluate(selectors => selectors.map(selector => { const r=document.querySelector(selector)!.getBoundingClientRect();return {selector,x:r.x,y:r.y,right:r.right,bottom:r.bottom}; }),selectors);
       for (const r of rectangles) {
         expect(r.x,`${r.selector} left`).toBeGreaterThanOrEqual(0);

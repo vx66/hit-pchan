@@ -17,7 +17,7 @@ Escribe tu nombre y comienza a jugar. Cada clic o toque sobre la parte visible d
 - Quince frases personalizadas con tu nombre, en burbujas redondeadas que flotan. Aparecen cada 50 golpes y duran 15 segundos; después de la última frase, el ciclo vuelve a empezar.
 - Español, inglés y japonés, con fuentes incluidas localmente.
 - Diálogos de desbloqueo que detienen los golpes hasta pulsar «Continuar».
-- Pantalla final con texto progresivo y opción de jugar nuevamente.
+- Final con una pausa negra de dos segundos, un mensaje rojo personalizado y el botón «Continuar». Después aparecen tres segundos de negro, el sprite final flotante con «Volveré por ti…» y, tras volver a negro, la opción de jugar nuevamente.
 - Controles de teclado, gestión del foco y respeto a la preferencia de movimiento reducido.
 
 ### Progresión
@@ -114,7 +114,7 @@ El `Dockerfile` instala las dependencias, ejecuta las pruebas unitarias y compil
 ├── .dockerignore              # Exclusiones para la imagen
 ├── deploy/nginx.conf          # Recursos estáticos, caché y salud
 ├── public/                    # Favicon y sprites que sirve la aplicación
-├── sprites/                   # PNG originales, sin modificaciones
+├── sprites/                   # PNG originales, incluidas las cuatro fases
 ├── src/
 │   ├── components/            # Pantallas, cursor, diálogos y burbujas
 │   ├── game/                  # Lógica, umbrales y almacenamiento

@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { seed, advance, readClicks } from './helpers';
+import { seed, advance, readClicks, finishEnding } from './helpers';
 async function keyboardHit(page: import('@playwright/test').Page) { await page.getByRole('button', {name:'Golpear a P-Chan'}).focus(); await page.keyboard.press('Enter'); }
 test('start, translations, mouse hit, synchronized sprites and persistence', async ({ page }) => {
   await page.goto('/');
@@ -42,13 +42,14 @@ test('rapid hits stop exactly at pending dialog', async ({page}) => {
   await expect(page.getByRole('dialog')).toBeVisible();
   expect(await readClicks(page)).toBe(500);
 });
-test('ending stays black after reload with replay button', async ({page}) => {
-  await page.emulateMedia({reducedMotion:'reduce'}); await seed(page,1499);
+test('completed ending survives reload and can be replayed', async ({page}) => {
+  await page.clock.install(); await page.emulateMedia({reducedMotion:'reduce'}); await seed(page,1499);
   await keyboardHit(page);
   await expect(page.locator('.ending-screen')).toHaveCSS('background-color','rgb(0, 0, 0)');
-  await expect(page.getByRole('button', {name:'Jugar nuevamente'})).toBeVisible();
-  await expect(page.locator('.ending-screen')).toContainText('¿Estás feliz?');
-  await page.reload(); await expect(page.locator('.ending-screen')).toBeVisible();
+  await expect(page.locator('.ending-screen')).toHaveAttribute('data-stage','intro');
+  await expect(page.getByRole('button')).toHaveCount(0);
+  await finishEnding(page);
+  await page.reload(); await expect(page.locator('.ending-screen')).toHaveAttribute('data-stage','intro');
 });
 test('mobile fits and touch hits only once', async ({browser}) => {
   const context = await browser.newContext({viewport:{width:390,height:844}, hasTouch:true, baseURL:'http://127.0.0.1:4173'});
@@ -105,8 +106,8 @@ test('speech appears at fifty, cycles, translates and expires', async ({page}) =
   await expect(page.getByRole('status')).toHaveText('Why are you hitting me, Ame?');
 });
 test('replay clears progression and keeps name and language', async ({page}) => {
-  await page.emulateMedia({reducedMotion:'reduce'});await seed(page,1499);
-  await keyboardHit(page);await page.getByRole('button',{name:'Jugar nuevamente'}).click();
+  await page.clock.install();await page.emulateMedia({reducedMotion:'reduce'});await seed(page,1499);
+  await keyboardHit(page);await finishEnding(page);await page.getByRole('button',{name:'Jugar nuevamente'}).click();
   await expect(page.getByLabel('Tu nombre')).toHaveValue('Ame');
   await page.getByRole('button',{name:'Click para empezar'}).click();
   await expect(page.locator('.hit-counter')).toContainText('Has golpeado 0 veces');

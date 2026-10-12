@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { confirmUnlock, getPhase, getWeaponPhase, restoreSessionState, hit, initialState, pendingUnlock, restoreState } from '../src/game/gameLogic';
 import { getPhrase, phrases } from '../src/i18n/phrases';
 import { translations } from '../src/i18n';
+import { ENDING_CONFIG } from '../src/game/constants';
 import { existsSync, readFileSync } from 'node:fs';
 describe('phase boundaries', () => {
   it.each([[0,1],[499,1],[500,1],[549,1],[550,2],[999,2],[1000,2],[1049,2],[1050,3],[1499,3],[1500,4]])('%i hits -> phase %i', (clicks, phase) => expect(getPhase(clicks)).toBe(phase));
@@ -85,4 +86,11 @@ it('resets incomplete sessions on reload while keeping preferences', () => {
 it('preserves completed endings on reload, including older endings', () => {
   expect(restoreSessionState({...initialState,clicks:1500,completed:true}).completed).toBe(true);
   expect(restoreSessionState({...initialState,clicks:2500,completed:true}).clicks).toBe(1500);
+});
+
+it('preserves the final sprite and configures exact black pauses', () => {
+  const path='sprites/pchan/fase_04/fase04_final.png';
+  expect(readFileSync(`public/${path}`).equals(readFileSync(path))).toBe(true);
+  expect(ENDING_CONFIG.INTRO_MS).toBe(2000);
+  expect(ENDING_CONFIG.BLACKOUT_MS).toBe(3000);
 });

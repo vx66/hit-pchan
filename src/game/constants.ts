@@ -2,3 +2,4 @@ export const GAME_CONFIG = { HAMMER_UNLOCK: 500, PHASE_02_START: 550, KNIFE_UNLO
 export const STORAGE_KEY = 'pchan-clicker:v1';
 export const IMPACT_MS = 150;
 export const SPEECH_MS = 15000;
+export const ENDING_CONFIG = { INTRO_MS: 2000, CHARACTER_MS: 35, BLACKOUT_MS: 3000, SCARE_MS: 5000, OUTRO_MS: 1000 } as const;
